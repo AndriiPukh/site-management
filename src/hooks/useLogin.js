@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { projectAuth } from '../firebase/config'
+import { projectAuth, projectFirestore } from '../firebase/config'
 import { useAuthContext } from './useAuthContext'
 
 export const useLogin = () => {
@@ -13,6 +13,13 @@ export const useLogin = () => {
     setIsPending(true)
     try {
       const res = await projectAuth.signInWithEmailAndPassword(email, password)
+
+      // update oline status
+      const { uid } = res.user
+      await projectFirestore
+        .collection('users')
+        .doc(uid)
+        .update({ oline: true })
 
       // dispatch logout action
       dispatch({
