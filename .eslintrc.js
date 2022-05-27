@@ -55,7 +55,7 @@ module.exports = {
     'implicit-arrow-linebreak': 'off',
     'function-paren-newline': 'off',
     'object-curly-newline': [
-      'error',
+      'off',
       {
         ObjectExpression: 'always',
         ObjectPattern: {
