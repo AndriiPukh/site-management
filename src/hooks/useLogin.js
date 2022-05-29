@@ -19,7 +19,7 @@ export const useLogin = () => {
       await projectFirestore
         .collection('users')
         .doc(uid)
-        .update({ oline: true })
+        .update({ online: true })
 
       // dispatch logout action
       dispatch({
