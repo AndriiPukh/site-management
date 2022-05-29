@@ -69,6 +69,7 @@ module.exports = {
       },
     ],
     'import/prefer-default-export': 0,
+    'operator-linebreak': ['off'],
     'jsx-a11y/no-static-element-interactions': [
       'off',
       {
