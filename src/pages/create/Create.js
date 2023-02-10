@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import './Create.css'
 import Select from 'react-select'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useCollection } from '../../hooks/useCollection'
 import { timestamp } from '../../firebase/config'
 import { useAuthContext } from '../../hooks/useAuthContext'
@@ -15,7 +15,7 @@ const CATEGORIES = [
 ]
 
 function Create() {
-  const history = useHistory()
+  const navigate = useNavigate()
   const { documents } = useCollection('users')
   const [users, setUsers] = useState([])
   const { user } = useAuthContext()
@@ -63,7 +63,7 @@ function Create() {
 
     await addDocument(project)
     if (!response.error) {
-      history.push('/')
+      navigate('/')
     }
   }
 

@@ -1,6 +1,6 @@
 import React from 'react'
 import './App.css'
-import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Dashboard from './pages/dashboard/Dashboard'
 import Create from './pages/create/Create'
 import Login from './pages/login/Login'
@@ -20,28 +20,29 @@ function App() {
           <Sidebar />
           <div className="container">
             <Navbar />
-            <Switch>
-              <Route exact path="/">
-                {user && <Dashboard />}
-                {!user && <Redirect to="/login" />}
-              </Route>
-              <Route path="/create">
-                {user && <Create />}
-                {!user && <Redirect to="/login" />}
-              </Route>
-              <Route path="/login">
-                {user && <Redirect to="/" />}
-                {!user && <Login />}
-              </Route>
-              <Route path="/signup">
-                {!user && <Signup />}
-                {user && <Redirect to="/" />}
-              </Route>
-              <Route path="/projects/:id">
-                {!user && <Redirect to="/login" />}
-                {user && <Project />}
-              </Route>
-            </Switch>
+            <Routes>
+              <Route
+                exact
+                path="/"
+                element={user ? <Dashboard /> : <Navigate to="/login" />}
+              />
+              <Route
+                path="/create"
+                element={user ? <Create /> : <Navigate to="/login" />}
+              />
+              <Route
+                path="/login"
+                element={user ? <Navigate to="/" /> : <Login />}
+              />
+              <Route
+                path="/signup"
+                element={user ? <Navigate to="/" /> : <Signup />}
+              />
+              <Route
+                path="/projects/:id"
+                element={user ? <Project /> : <Navigate to="/login" />}
+              />
+            </Routes>
           </div>
           {user && <OnlineUsers />}
         </BrowserRouter>
