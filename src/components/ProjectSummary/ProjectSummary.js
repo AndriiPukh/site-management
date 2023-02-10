@@ -1,5 +1,5 @@
 import React from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import Avatar from '../Avatar/Avatar'
 import { useFirestore } from '../../hooks/useFirestore'
 import { useAuthContext } from '../../hooks/useAuthContext'
@@ -9,11 +9,11 @@ function ProjectSummary({ project }) {
   const {
     user: { uid },
   } = useAuthContext()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const handleClick = () => {
     deleteDocument(project.id)
-    history.push('/')
+    navigate('/')
   }
   return (
     <div className="project-summary">
