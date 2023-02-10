@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
-import {
-  projectAuth,
-  projectFirestore,
-  projectStorage,
-} from '../firebase/config'
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
+import { addDoc, collection } from 'firebase/firestore'
+import { ref, getDownloadURL, uploadBytesResumable } from 'firebase/storage'
+import { auth, db, storage } from '../firebase/config'
 import { useAuthContext } from './useAuthContext'
 
 export const useSignup = () => {
@@ -16,36 +15,40 @@ export const useSignup = () => {
     setError(null)
     setIsPending(true)
     try {
-      const res = await projectAuth.createUserWithEmailAndPassword(
-        email,
-        password
-      )
+      const res = await createUserWithEmailAndPassword(auth, email, password)
       if (!res) {
         throw new Error('Could not complete signup')
       }
 
       // upload user thumbnail
       const UPLOAD_PATH = `thumbnail/${res.user.uid}/${thumbnail}`
-      const image = await projectStorage.ref(UPLOAD_PATH).put(thumbnail)
-      const imageUrl = await image.ref.getDownloadURL()
-      // add display name to user
-      await res.user.updateProfile({
-        displayName,
-        photoURL: imageUrl,
-      })
+      const storageRef = ref(storage, UPLOAD_PATH)
+      const uploadTask = uploadBytesResumable(storageRef, thumbnail)
+      uploadTask.on(
+        'state_changed',
+        () => {},
+        (err) => {
+          setError(err)
+        },
+        async () => {
+          const imgUrl = await getDownloadURL(uploadTask.snapshot.ref)
+          await updateProfile(res.user, {
+            displayName,
+            photoURL: imgUrl,
+          })
+          await addDoc(collection(db, 'users'), {
+            uid: res.user.uid,
+            online: true,
+            displayName,
+            photoURL: imgUrl,
+          })
+          dispatch({
+            type: 'LOGIN',
+            payload: res.user,
+          })
+        }
+      )
 
-      // create a user document
-      await projectFirestore.collection('users').doc(res.user.uid).set({
-        online: true,
-        displayName,
-        photoURL: imageUrl,
-      })
-
-      // dispatch login action
-      dispatch({
-        type: 'LOGIN',
-        payload: res.user,
-      })
       // update status
       if (!isCancelled) {
         setIsPending(false)
