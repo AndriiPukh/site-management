@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
-import { projectAuth, projectFirestore } from '../firebase/config'
+import { signInWithEmailAndPassword } from 'firebase/auth'
+import { collection, setDoc } from 'firebase/firestore'
+import { auth, db } from '../firebase/config'
 import { useAuthContext } from './useAuthContext'
 
 export const useLogin = () => {
@@ -12,14 +14,12 @@ export const useLogin = () => {
     setError(null)
     setIsPending(true)
     try {
-      const res = await projectAuth.signInWithEmailAndPassword(email, password)
+      const res = await signInWithEmailAndPassword(auth, email, password)
 
       // update oline status
       const { uid } = res.user
-      await projectFirestore
-        .collection('users')
-        .doc(uid)
-        .update({ online: true })
+
+      await setDoc(collection(db, 'users', uid), { online: true })
 
       // dispatch logout action
       dispatch({
